@@ -10,6 +10,7 @@ const app=express();
 const multer = require('multer');
 const uploadMiddleware = multer({dest : 'uploads'})
 const fs = require('fs');
+const PORT = process.env.PORT || 4000;
 
 const salt = bcrypt.genSaltSync(10);
 const secret = 'dfveet437g34bt5hb5t93ug34l434bt'
@@ -144,7 +145,7 @@ app.post('/logout',async (req,res)=>{
     res.cookie('token','').json('ok') 
 })
   
-app.listen(4000,()=>{
+app.listen(PORT,()=>{
     console.log("App is listening at port 4000")
 }) 
 
