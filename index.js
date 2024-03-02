@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 4000;
 const salt = bcrypt.genSaltSync(10);
 const secret = 'dfveet437g34bt5hb5t93ug34l434bt'
 
-app.use(cors({credentials:true, origin:'*'}));
+app.use(cors({credentials:true}));
 app.use(express.json());
 app.use(cookieParser());
 app.use('/uploads',express.static(__dirname+'/uploads'))
