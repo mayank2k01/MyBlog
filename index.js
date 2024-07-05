@@ -66,7 +66,7 @@ app.post('/login',async (req,res)=>{
         if(passOk){
           jwt.sign({username,id: userDoc._id},secret,{},(err,token)=>{
             if(err) throw err;
-            console.log('token---',token);
+            // console.log('token---',token);
             // res.cookie('token',token).json({
             //     id:userDoc._id,
             //     username, 
@@ -95,7 +95,7 @@ app.get('/profile',(req,res)=>{
     if(token){
         jwt.verify(token,secret,{},(err,info)=>{
             if(err) throw err;
-            console.log(info);
+            // console.log(info);
             res.json(info);
         })
     }
@@ -111,7 +111,7 @@ app.post('/post', uploadMiddleware.single('file'), async (req,res) => {
     fs.renameSync(path, newPath);
   
     const {token} = req.cookies;
-    console.log('check token---',token);
+    // console.log('check token---',token);
     if(token){
       jwt.verify(token, secret, {}, async (err,info) => {
         if (err) throw err;
