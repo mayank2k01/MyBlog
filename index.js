@@ -10,12 +10,31 @@ const app=express();
 const multer = require('multer');
 const uploadMiddleware = multer({dest : 'uploads'})
 const fs = require('fs');
+const { log } = require('console');
 const PORT = process.env.PORT || 4000;
 
 const salt = bcrypt.genSaltSync(10);
 const secret = 'dfveet437g34bt5hb5t93ug34l434bt'
 
-app.use(cors({credentials:true, origin:'*'}));
+// app.use(cors({credentials:true}));
+// var cors = require(cors());
+
+// app.use(cors());
+// app.options('*',cors());
+// var allowCrossDomain = function(req,res,next) {
+//   res.header('Access-Control-Allow-Origin', '*');
+//   res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE');
+//   res.header('Access-Control-Allow-Headers', 'Content-Type');
+//   next();  
+// }
+// app.use(allowCrossDomain);
+
+app.use(cors({
+  origin: 'http://localhost:3000',  // Change this to your React app's URL
+  credentials: true,  // Allow cookies to be sent
+}));
+
+
 app.use(express.json());
 app.use(cookieParser());
 app.use('/uploads',express.static(__dirname+'/uploads'))
@@ -41,14 +60,25 @@ app.post('/login',async (req,res)=>{
     const {username,password}=req.body;
     try{
         const userDoc=await User.findOne({username})
+        // console.log(userDoc);
         const passOk=bcrypt.compareSync(password,userDoc.password)
+        // console.log(passOk);
         if(passOk){
-                jwt.sign({username,id: userDoc._id},secret,{},(err,token)=>{
-                if(err) throw err;
-                res.cookie('token',token).json({
-                    id:userDoc._id,
-                    username, 
-                });
+          jwt.sign({username,id: userDoc._id},secret,{},(err,token)=>{
+            if(err) throw err;
+            console.log('token---',token);
+            // res.cookie('token',token).json({
+            //     id:userDoc._id,
+            //     username, 
+            // });
+            res.cookie('token', token, {
+                httpOnly: true,
+                sameSite: 'None',  // Use 'Strict' or 'None' depending on your setup
+                secure: false     // Use true for HTTPS, false for HTTP (development)
+            }).json({
+                id: userDoc._id,
+                username,
+            });
             })
         }else{
             res.status(400).json('Wrong Credentials')
@@ -61,11 +91,11 @@ app.post('/login',async (req,res)=>{
 })
 
 app.get('/profile',(req,res)=>{
-    console.log('hi')
     const {token} = req.cookies;
-    if(token!=''){
+    if(token){
         jwt.verify(token,secret,{},(err,info)=>{
             if(err) throw err;
+            console.log(info);
             res.json(info);
         })
     }
@@ -81,20 +111,24 @@ app.post('/post', uploadMiddleware.single('file'), async (req,res) => {
     fs.renameSync(path, newPath);
   
     const {token} = req.cookies;
-    jwt.verify(token, secret, {}, async (err,info) => {
-      if (err) throw err;
-      console.log(info);
-      const {title,summary,content} = req.body;
-      const postDoc = await Post.create({
-        title,
-        summary,
-        content,
-        cover:newPath,
-        author:info.id,
+    console.log('check token---',token);
+    if(token){
+      jwt.verify(token, secret, {}, async (err,info) => {
+        if (err) throw err;
+        console.log(info);
+        const {title,summary,content} = req.body;
+        const postDoc = await Post.create({
+          title,
+          summary,
+          content,
+          cover:newPath,
+          author:info.id,
+        });
+        
+        res.json(postDoc);
       });
-      
-      res.json(postDoc);
-    });
+    }
+     else res.status(400).json('Couldnt create post');
   
   });
 
