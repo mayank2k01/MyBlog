@@ -39,11 +39,18 @@ app.use(express.json());
 app.use(cookieParser());
 app.use('/uploads',express.static(__dirname+'/uploads'))
 
-mongoose.connect('mongodb+srv://jhamayank707:admin@cluster0.5bkiog7.mongodb.net/?retryWrites=true&w=majority')
+mongoose.connect('mongodb+srv://jhamayank707:admin@cluster0.5bkiog7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
+    // mongodb+srv://jhamayank707:<password>@cluster0.5bkiog7.mongodb.net/?retryWrites=true&w=majority
 .then(console.log('success'))
 .catch((e)=>{
     console.log(e);
 })
+
+// app.use(function (req, res, next) {
+//    res.header("Access-Control-Allow-Origin", "*");
+//    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+//    next();
+// })
 
 app.post('/register',async (req,res)=>{
     const {username,password}=req.body;
