@@ -30,7 +30,7 @@ const secret = 'dfveet437g34bt5hb5t93ug34l434bt'
 // app.use(allowCrossDomain);
 
 app.use(cors({
-  origin: 'http://localhost:3000',  // Change this to your React app's URL
+  origin: '*',  // Change this to your React app's URL
   credentials: true,  // Allow cookies to be sent
 }));
 
